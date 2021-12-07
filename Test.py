@@ -84,8 +84,7 @@ def genDealerOds(c, thisDeck):
         for od in toRem:
             del ods[od]
 
-    for od in ods:
-        print(od, ods[od])
+    
     ret = {}
     for od in ods:
         score = handToBestScore(od)
@@ -126,19 +125,26 @@ def dealerStays(h):
         else:
             return False
 
+def genPlayerOds(h, d):
+    ods = getHandOdds(h, d, 1)
+    ret = {}
+    for od in ods:
+        ret[handToBestScore(od)] = ods[od]
+    return ret
+
 numDecks = 1
-playerHand = (2,3)
-dealer = (10,)
-
-
 deck = createDeck(numDecks)
+
+
+playerHand = (10,4)
+deck = removeCard(5, deck)
+deck = removeCard(6, deck)
+dealerHand = (10,)
 deck = removeCard(10, deck)
 
-cards = totalDeck(deck)
+dealerOds = genDealerOds(dealerHand, deck)
+playerOds = genPlayerOds(playerHand, deck)
 
-dist = getDistribution(deck)
-ods = getHandOdds(dealer, deck, 1)
-
-dealerOds = genDealerOds(dealer, deck)
-print(deck)
 print(dealerOds)
+print(playerOds)
+
