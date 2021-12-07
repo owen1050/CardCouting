@@ -84,7 +84,7 @@ def genDealerOds(c, thisDeck):
         for od in toRem:
             del ods[od]
 
-    
+
     ret = {}
     for od in ods:
         score = handToBestScore(od)
@@ -129,26 +129,58 @@ def genPlayerOds(h, d):
     ods = getHandOdds(h, d, 1)
     ret = {}
     for od in ods:
-        ret[handToBestScore(od)] = ods[od]
+        h = handToBestScore(od)
+        if h in ret:
+            ret[h] = ret[h] + ods[od]
+        else:
+            ret[h] =  ods[od]
     return ret
 
-def shouldPlayerHit(playerOds, dealerOds)
+def odsHandLoses(handV, ods):
+    loses = 0
+    for od in ods:
+        if handV < od:
+            loses = loses + ods[od]
+    return loses
+
+def shouldPlayerHit(playerHand, playerOds, dealerOds):
+    currentScore = handToPoints(playerHand)[0]
+    stayLoseChance = odsHandLoses(currentScore, dealerOds)
+    hitLoseChance = 0
+    for pod in playerOds:
+        for dod in dealerOds:
+            if pod < dod or pod == -1:
+                hitLoseChance = hitLoseChance + playerOds[pod] * dealerOds[dod]
+    #print(stayLoseChance, hitLoseChance)
+    if(hitLoseChance < stayLoseChance):
+        return True
+    return False
+
+def shouldPlayerHitHand(deck, playerCard1, playerCard2, dealerCard):
+    playerHand = (playerCard1,playerCard2)
+    deck = removeCard(playerCard1, deck)
+    deck = removeCard(playerCard2, deck)
+    dealerHand = (dealerCard,)
+    deck = removeCard(dealerCard, deck)
+
+    dealerOds = genDealerOds(dealerHand, deck)
+    playerOds = genPlayerOds(playerHand, deck)
+    #print(playerOds)
+    #print(dealerOds)
+    sph = shouldPlayerHit(playerHand, playerOds, dealerOds)
+
+    return sph
 
 numDecks = 1
 deck = createDeck(numDecks)
 
-
-playerHand = (10,4)
-deck = removeCard(5, deck)
-deck = removeCard(6, deck)
-dealerHand = (10,)
-deck = removeCard(10, deck)
-
-dealerOds = genDealerOds(dealerHand, deck)
-playerOds = genPlayerOds(playerHand, deck)
-
-print(dealerOds)
-print(playerOds)
-
-sph = shouldPlayerHit(playerOds, dealerOds)
-
+for i in range(10,11):
+    for j in range(2,8):
+        p = ""
+        for k in range(1,11):
+            a = shouldPlayerHitHand(deck, i, j, k)
+            if(a):
+                p = p + "0\t"
+            else:
+                p = p + "1\t"
+        print(i,j,k,p)
