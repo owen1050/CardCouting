@@ -46,35 +46,99 @@ def handsToPoints(h):
             else:
                 for k in range(len(possPts)):
                     possPts[k] = possPts[k] + j
-
         ret[tuple(possPts)] = h[i]
     return ret
 
-def genAllOds(thisDeck)
+def handToPoints(h):
+    ret = 0
+    possPts = [0]
+    for j in h:
+        if(j == 1):
+            for k in range(len(possPts)):
+                possPts.append(possPts[k] + 11)
+                possPts[k] = possPts[k] + 1
+        else:
+            for k in range(len(possPts)):
+                possPts[k] = possPts[k] + j
 
-def allOdsToBestHands(allOds):
-    for od in allOds:
-        print(od)
+    return possPts
 
+def genDealerOds(c, thisDeck):
+    ods = getHandOdds(c, thisDeck, 1)
+
+    while(allHandsStay(ods) == False):
+        #print(ods)
+        toRem = []
+        toAdd = []
+        for od in ods:
+            if(dealerStays(od) == False and ods[od] > 0):
+                deck = thisDeck
+                for d in od:
+                    deck = removeCard(d, deck)
+                newOds = getHandOdds(od, deck, ods[od])
+                toRem.append(od)
+                toAdd.append(newOds)
+        for odD in toAdd:
+            for od in odD:
+                ods[od] = odD[od]
+        for od in toRem:
+            del ods[od]
+
+    for od in ods:
+        print(od, ods[od])
+    ret = {}
+    for od in ods:
+        score = handToBestScore(od)
+        if(score in ret):
+            ret[score] = ods[od] + ret[score]
+        else:
+            if(ods[od] > 0):
+                ret[score] = ods[od]
+
+    return ret
+
+def allHandsStay(h):
+    AllStay = True
+    for hand in h:
+        if(dealerStays(hand) == False and h[hand] > 0):
+            AllStay = False
+    return AllStay
+
+def handToBestScore(h):
+    ns = handToPoints(h)
+    best = -1
+    for i in ns:
+        if i > best and i < 22:
+            best = i
+    return best
+
+def dealerStays(h):
+    H = list(h)
+    if(1 in H):
+        bs = handToBestScore(h)
+        if( bs > 17 or  bs == -1):
+            return True
+        else:
+            return False
+    else:
+        if sum(H) >= 17:
+            return True
+        else:
+            return False
 
 numDecks = 1
 playerHand = (2,3)
-dealer = (1,)
+dealer = (10,)
+
 
 deck = createDeck(numDecks)
+deck = removeCard(10, deck)
+
 cards = totalDeck(deck)
-newDeck = removeCard(1, deck)
-dist = getDistribution(newDeck)
-ods = getHandOdds(dealer, newDeck, 1)
-pts = handsToPoints(ods)
-allOds = []
-for od in ods:
-    thisDeck = newDeck
-    for c in od:
-        thisDeck = removeCard(c, thisDeck)
-    newOds = getHandOdds(od, thisDeck, ods[od])
-    t = handsToPoints(newOds)
-    allOds.append(t)
 
+dist = getDistribution(deck)
+ods = getHandOdds(dealer, deck, 1)
 
-
+dealerOds = genDealerOds(dealer, deck)
+print(deck)
+print(dealerOds)
