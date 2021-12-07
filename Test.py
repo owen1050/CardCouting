@@ -132,6 +132,8 @@ def genPlayerOds(h, d):
         ret[handToBestScore(od)] = ods[od]
     return ret
 
+def shouldPlayerHit(playerOds, dealerOds)
+
 numDecks = 1
 deck = createDeck(numDecks)
 
@@ -147,4 +149,6 @@ playerOds = genPlayerOds(playerHand, deck)
 
 print(dealerOds)
 print(playerOds)
+
+sph = shouldPlayerHit(playerOds, dealerOds)
 
